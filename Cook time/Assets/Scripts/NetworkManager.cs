@@ -3,7 +3,6 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using System.Threading.Tasks;
-using System.Linq;
 
 public class NetworkManager : MonoBehaviour
 {
@@ -14,12 +13,9 @@ public class NetworkManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI statusText;
 
     private NetworkRunner runner;
-    private GameManager gameManager;
 
     private void Start()
     {
-        gameManager = GameManager.Instance;
-
         if (hostButton != null)
             hostButton.onClick.AddListener(() => StartGame(GameMode.Host));
 
@@ -32,8 +28,13 @@ public class NetworkManager : MonoBehaviour
         if (statusText != null)
             statusText.text = "Conectando...";
 
-        runner = gameObject.AddComponent<NetworkRunner>();
+        // Cria um GameObject separado para o NetworkRunner se não existir
+        GameObject runnerObj = new GameObject("NetworkRunner");
+        runner = runnerObj.AddComponent<NetworkRunner>();
         runner.ProvideInput = true;
+
+        // Mantém o objeto entre cenas
+        DontDestroyOnLoad(runnerObj);
 
         string sessionName = string.IsNullOrEmpty(sessionNameInput.text) ? "CookTimeRoom" : sessionNameInput.text;
 
@@ -51,50 +52,24 @@ public class NetworkManager : MonoBehaviour
 
         if (result.Ok)
         {
-            Debug.Log($"Conectado! Modo: {mode}");
+            Debug.Log($"✅ Conectado! Modo: {mode}");
             if (statusText != null)
                 statusText.text = $"Conectado! Sala: {sessionName}";
 
             if (hostButton != null) hostButton.gameObject.SetActive(false);
             if (joinButton != null) joinButton.gameObject.SetActive(false);
-
-            await Task.Delay(100);
-            SpawnPlayerWithRole();
         }
         else
         {
-            Debug.LogError($"Erro ao conectar: {result.ShutdownReason}");
+            Debug.LogError($"❌ Erro ao conectar: {result.ShutdownReason}");
             if (statusText != null)
                 statusText.text = $"Erro: {result.ShutdownReason}";
         }
     }
 
-    private void SpawnPlayerWithRole()
+    public void Disconnect()
     {
-        if (gameManager == null)
-        {
-            gameManager = GameManager.Instance;
-            if (gameManager == null) return;
-        }
-
-        int connectedPlayers = runner.ActivePlayers.Count();
-        RoleType myRole = (RoleType)((connectedPlayers - 1) % 3);
-        if (myRole < 0) myRole = RoleType.BreadMaster;
-
-        NetworkObject mySkin = gameManager.GetSkinForRole(myRole);
-        if (mySkin == null) return;
-
-        Transform myTable = gameManager.GetTableForRole(myRole);
-        Vector3 spawnPos = myTable != null ? myTable.position + new Vector3(0, 1, -1.5f) : new Vector3(0, 1, 0);
-
-        var playerObj = runner.Spawn(mySkin, spawnPos, Quaternion.identity, runner.LocalPlayer);
-
-        PlayerRole roleScript = playerObj.GetComponent<PlayerRole>();
-        if (roleScript != null)
-            roleScript.MyRole = myRole;
-
-        gameManager.PlayerConnected();
-
-        Debug.Log($"🎮 Jogador spawnado como {myRole}");
+        if (runner != null)
+            runner.Shutdown();
     }
 }
