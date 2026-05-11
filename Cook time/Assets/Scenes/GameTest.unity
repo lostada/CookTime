@@ -549,12 +549,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eeba406703ef56e42822919216024828, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerMovement
+  _runner: {fileID: 0}
+  _object: {fileID: 0}
+  InvokeRpc: 0
+  ObjectIndex: 0
+  WordOffset: 0
+  WordCount: 0
+  DefaultReplicated: 1
   walkSpeed: 5
   mouseSensitivity: 2
-  cameraHeight: 1.6
-  minLookAngle: -90
-  maxLookAngle: 90
-  playerCamera: {fileID: 926907381}
+  controller: {fileID: 0}
+  playerCamera: {fileID: 0}
+  xRotation: 0
+  moveDirection: {x: 0, y: 0, z: 0}
 --- !u!23 &759680082
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -620,7 +627,7 @@ Transform:
   m_GameObject: {fileID: 759680079}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 16.53575, y: 1.33, z: 6.37923}
+  m_LocalPosition: {x: 16.53575, y: -0.07, z: 6.37923}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -698,7 +705,6 @@ MonoBehaviour:
   NetworkedBehaviours:
   - {fileID: 759680090}
   - {fileID: 759680089}
-  - {fileID: 759680080}
   - {fileID: 759680088}
   ForceRemoteRenderTimeframe: 0
 --- !u!114 &759680088
@@ -766,10 +772,10 @@ CapsuleCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 0.56273675
-  m_Height: 2.0659366
+  m_Radius: 0.5
+  m_Height: 2
   m_Direction: 1
-  m_Center: {x: -0.038384438, y: 0.032968283, z: 0.024352312}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &926907379
 GameObject:
   m_ObjectHideFlags: 0
