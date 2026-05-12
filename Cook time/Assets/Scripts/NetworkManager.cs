@@ -1,75 +1,101 @@
 ﻿using Fusion;
+using Fusion.Sockets;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-using System.Threading.Tasks;
 
-public class NetworkManager : MonoBehaviour
+public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
 {
     [Header("UI")]
     [SerializeField] private Button hostButton;
     [SerializeField] private Button joinButton;
-    [SerializeField] private TMP_InputField sessionNameInput;
+    [SerializeField] private TMP_InputField roomInput;
     [SerializeField] private TextMeshProUGUI statusText;
 
-    private NetworkRunner runner;
+    [Header("Player")]
+    [SerializeField] private NetworkObject playerPrefab;
+
+    private NetworkRunner _runner;
 
     private void Start()
     {
-        if (hostButton != null)
-            hostButton.onClick.AddListener(() => StartGame(GameMode.Host));
-
-        if (joinButton != null)
-            joinButton.onClick.AddListener(() => StartGame(GameMode.Client));
+        hostButton?.onClick.AddListener(() => StartGame(GameMode.Host));
+        joinButton?.onClick.AddListener(() => StartGame(GameMode.Client));
     }
 
     private async void StartGame(GameMode mode)
     {
-        if (statusText != null)
-            statusText.text = "Conectando...";
+        SetStatus("Conectando...");
 
-        // Cria um GameObject separado para o NetworkRunner se não existir
-        GameObject runnerObj = new GameObject("NetworkRunner");
-        runner = runnerObj.AddComponent<NetworkRunner>();
-        runner.ProvideInput = true;
+        var go = new GameObject("NetworkRunner");
+        DontDestroyOnLoad(go);
 
-        // Mantém o objeto entre cenas
-        DontDestroyOnLoad(runnerObj);
+        _runner = go.AddComponent<NetworkRunner>();
+        _runner.ProvideInput = true;
+        _runner.AddCallbacks(this);
 
-        string sessionName = string.IsNullOrEmpty(sessionNameInput.text) ? "CookTimeRoom" : sessionNameInput.text;
+        string room = string.IsNullOrEmpty(roomInput?.text) ? "Sala1" : roomInput.text;
 
-        var startGameArgs = new StartGameArgs()
+        var result = await _runner.StartGame(new StartGameArgs
         {
             GameMode = mode,
-            SessionName = sessionName,
-            Scene = SceneRef.FromIndex(UnityEngine.SceneManagement.SceneManager.GetActiveScene().buildIndex),
-            PlayerCount = 3,
-            IsVisible = true,
-            IsOpen = true
-        };
-
-        var result = await runner.StartGame(startGameArgs);
+            SessionName = room,
+            Scene = SceneRef.FromIndex(
+                UnityEngine.SceneManagement.SceneManager.GetActiveScene().buildIndex),
+            SceneManager = go.AddComponent<NetworkSceneManagerDefault>()
+        });
 
         if (result.Ok)
         {
-            Debug.Log($"✅ Conectado! Modo: {mode}");
-            if (statusText != null)
-                statusText.text = $"Conectado! Sala: {sessionName}";
-
-            if (hostButton != null) hostButton.gameObject.SetActive(false);
-            if (joinButton != null) joinButton.gameObject.SetActive(false);
+            SetStatus($"Conectado! Sala: {room}");
+            hostButton?.gameObject.SetActive(false);
+            joinButton?.gameObject.SetActive(false);
         }
         else
         {
-            Debug.LogError($"❌ Erro ao conectar: {result.ShutdownReason}");
-            if (statusText != null)
-                statusText.text = $"Erro: {result.ShutdownReason}";
+            SetStatus($"Erro: {result.ShutdownReason}");
         }
     }
 
-    public void Disconnect()
+    // Spawna o player quando alguém entra
+    public void OnPlayerJoined(NetworkRunner runner, PlayerRef player)
     {
-        if (runner != null)
-            runner.Shutdown();
+        if (runner.IsServer)
+        {
+            Vector3 pos = new Vector3(Random.Range(-3f, 3f), 1f, Random.Range(-3f, 3f));
+            runner.Spawn(playerPrefab, pos, Quaternion.identity, player);
+        }
     }
+
+    // Envia input pro Fusion
+    public void OnInput(NetworkRunner runner, NetworkInput input)
+    {
+        // PlayerController lê Input direto no FixedUpdateNetwork
+        // esse callback precisa existir mas pode ficar vazio
+    }
+
+    private void SetStatus(string msg)
+    {
+        if (statusText != null) statusText.text = msg;
+        Debug.Log(msg);
+    }
+
+    public void OnPlayerLeft(NetworkRunner r, PlayerRef p) { }
+    public void OnInputMissing(NetworkRunner r, PlayerRef p, NetworkInput i) { }
+    public void OnShutdown(NetworkRunner r, ShutdownReason reason) { }
+    public void OnConnectedToServer(NetworkRunner r) { }
+    public void OnDisconnectedFromServer(NetworkRunner r, NetDisconnectReason reason) { }
+    public void OnConnectRequest(NetworkRunner r, NetworkRunnerCallbackArgs.ConnectRequest req, byte[] token) { }
+    public void OnConnectFailed(NetworkRunner r, NetAddress addr, NetConnectFailedReason reason) { }
+    public void OnUserSimulationMessage(NetworkRunner r, SimulationMessagePtr msg) { }
+    public void OnSessionListUpdated(NetworkRunner r, List<SessionInfo> list) { }
+    public void OnCustomAuthenticationResponse(NetworkRunner r, Dictionary<string, object> data) { }
+    public void OnHostMigration(NetworkRunner r, HostMigrationToken token) { }
+    public void OnReliableDataReceived(NetworkRunner r, PlayerRef p, ReliableKey key, System.ArraySegment<byte> data) { }
+    public void OnReliableDataProgress(NetworkRunner r, PlayerRef p, ReliableKey key, float progress) { }
+    public void OnSceneLoadDone(NetworkRunner r) { }
+    public void OnSceneLoadStart(NetworkRunner r) { }
+    public void OnObjectExitAOI(NetworkRunner r, NetworkObject o, PlayerRef p) { }
+    public void OnObjectEnterAOI(NetworkRunner r, NetworkObject o, PlayerRef p) { }
 }
