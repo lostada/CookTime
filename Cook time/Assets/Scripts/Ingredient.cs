@@ -3,16 +3,26 @@ using UnityEngine;
 
 public class Ingredient : NetworkBehaviour
 {
-    public string ingredientName;
-
-    private void OnMouseEnter()
+    private void OnMouseDown()
     {
-        // Opcional: mudar cor quando olhar
-        GetComponent<Renderer>().material.color = Color.green;
+        // Acha o player local
+        PlayerInteraction interaction = FindLocalPlayer();
+        if (interaction == null)
+        {
+            Debug.LogWarning("PlayerInteraction local não encontrado!");
+            return;
+        }
+
+        interaction.TryPickup(this.gameObject);
     }
 
-    private void OnMouseExit()
+    private PlayerInteraction FindLocalPlayer()
     {
-        GetComponent<Renderer>().material.color = Color.white;
+        foreach (PlayerInteraction p in FindObjectsOfType<PlayerInteraction>())
+        {
+            if (p.Object != null && p.Object.HasInputAuthority)
+                return p;
+        }
+        return null;
     }
 }

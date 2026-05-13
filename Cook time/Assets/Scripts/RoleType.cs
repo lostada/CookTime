@@ -1,62 +1,36 @@
 ﻿using Fusion;
 using UnityEngine;
 
-public enum RoleType
-{
-    BreadMaster,
-    MeatMaster,
-    CheeseMaster
-}
+public enum RoleType { BreadMaster, MeatMaster, CheeseMaster }
 
 public class PlayerRole : NetworkBehaviour
 {
-    [Networked]
-    public RoleType MyRole { get; set; }
-
-    private GameManager gameManager;
+    [Networked] public RoleType MyRole { get; set; }
 
     public override void Spawned()
     {
-        gameManager = GameManager.Instance;
-
         if (Object.HasInputAuthority)
         {
-            // Atribui papel baseado no número do jogador na sala
-            int playerIndex = (Runner.LocalPlayer.PlayerId - 1) % 3;
-            MyRole = (RoleType)playerIndex;
-
-            Debug.Log($"🎭 Meu papel é: {MyRole}");
+            int idx = (Runner.LocalPlayer.PlayerId - 1) % 3;
+            MyRole = (RoleType)idx;
+            Debug.Log($"Meu papel: {MyRole}");
         }
     }
 
-    public bool CanPickupIngredient(string ingredientName)
+    private void Update()
     {
-        if (gameManager == null)
-            gameManager = GameManager.Instance;
+        // ✅ mesma correção do PlayerInteraction
+        if (Object == null || !Object.HasInputAuthority) return;
 
-        if (gameManager == null) return false;
-
-        switch (MyRole)
-        {
-            case RoleType.BreadMaster:
-                return System.Array.Exists(gameManager.breadOptions, x => x == ingredientName);
-            case RoleType.MeatMaster:
-                return System.Array.Exists(gameManager.meatOptions, x => x == ingredientName);
-            case RoleType.CheeseMaster:
-                return System.Array.Exists(gameManager.cheeseOptions, x => x == ingredientName);
-            default:
-                return false;
-        }
+        if (Input.GetKeyDown(KeyCode.Alpha1)) { MyRole = RoleType.BreadMaster; Debug.Log("Role: BreadMaster"); }
+        if (Input.GetKeyDown(KeyCode.Alpha2)) { MyRole = RoleType.MeatMaster; Debug.Log("Role: MeatMaster"); }
+        if (Input.GetKeyDown(KeyCode.Alpha3)) { MyRole = RoleType.CheeseMaster; Debug.Log("Role: CheeseMaster"); }
     }
 
-    public Color GetRoleColor()
+    public bool CanPickupByTag(string tag)
     {
-        switch (MyRole)
-        {
-            case RoleType.BreadMaster: return new Color(0.8f, 0.5f, 0.2f);
-            case RoleType.MeatMaster: return Color.red;
-            case RoleType.CheeseMaster: return Color.yellow;
-            default: return Color.white;
-        }
+        return (MyRole == RoleType.BreadMaster && tag == "Bread") ||
+               (MyRole == RoleType.MeatMaster && tag == "Meat") ||
+               (MyRole == RoleType.CheeseMaster && tag == "Cheese");
     }
 }

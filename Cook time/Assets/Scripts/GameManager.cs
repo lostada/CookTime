@@ -1,91 +1,129 @@
 ﻿using Fusion;
 using UnityEngine;
 using TMPro;
-using System.Collections.Generic;
 
 public class GameManager : NetworkBehaviour
 {
     public static GameManager Instance;
 
     [Header("Opções de cada jogador")]
-    public string[] breadOptions = { "PaoAustraliano", "PaoBrioche", "PaoDeManteiga" };
+    public string[] breadOptions = { "PaoAustraliano", "PaoBrioche", };
     public string[] meatOptions = { "CalabresaAcebolada", "Frango", "CarneMoida" };
-    public string[] cheeseOptions = { "QueijoPrato", "Mussarela", "Cheddar" };
+    public string[] cheeseOptions = { "QueijoPrato", "Cheddar" };
 
+
+    [Header("Ingredientes na Cena")]
+    public GameObject[] breadObjects;  // arraste os 2 pães aqui
+    public GameObject[] meatObjects;   // arraste as 3 carnes aqui
+    public GameObject[] cheeseObjects; // arraste os 2 queijos aqui
+
+    // Pega o ingrediente mais próximo do player baseado no role
+    public GameObject GetClosestIngredient(Vector3 playerPos, RoleType role)
+    {
+        GameObject[] targets = role switch
+        {
+            RoleType.BreadMaster => breadObjects,
+            RoleType.MeatMaster => meatObjects,
+            RoleType.CheeseMaster => cheeseObjects,
+            _ => null
+        };
+
+        if (targets == null) return null;
+
+        GameObject closest = null;
+        float closestDist = float.MaxValue;
+
+        foreach (GameObject obj in targets)
+        {
+            if (obj == null) continue; // já foi pego
+            float dist = Vector3.Distance(playerPos, obj.transform.position);
+            if (dist < closestDist)
+            {
+                closestDist = dist;
+                closest = obj;
+            }
+        }
+
+        return closest;
+    }
+    public void RemoveIngredient(GameObject obj, RoleType role)
+    {
+        System.Collections.Generic.List<GameObject> list = role switch
+        {
+            RoleType.BreadMaster => new System.Collections.Generic.List<GameObject>(breadObjects),
+            RoleType.MeatMaster => new System.Collections.Generic.List<GameObject>(meatObjects),
+            RoleType.CheeseMaster => new System.Collections.Generic.List<GameObject>(cheeseObjects),
+            _ => null
+        };
+
+        if (list == null) return;
+
+        int idx = list.IndexOf(obj);
+        if (idx >= 0)
+        {
+            if (role == RoleType.BreadMaster) breadObjects[idx] = null;
+            if (role == RoleType.MeatMaster) meatObjects[idx] = null;
+            if (role == RoleType.CheeseMaster) cheeseObjects[idx] = null;
+        }
+    }
     [Header("UI")]
     public TextMeshProUGUI orderText;
-    public TextMeshProUGUI statusText;
 
-    [Header("Pratos")]
-    public GameObject platePrefab;           // Prefab do prato
-    public Transform plateSpawnPoint;        // Onde o prato começa (mesa 1)
-    public Transform breadTablePlatePoint;   // Posição do prato na mesa do pão
-    public Transform meatTablePlatePoint;    // Posição do prato na mesa da carne
-    public Transform cheeseTablePlatePoint;  // Posição do prato na mesa do queijo
-    public Transform finalPlatePoint;        // Posição final (sanduíche pronto)
+    // ✅ FIX 1: usar NetworkString em vez de string pura
+    [Networked] public NetworkString<_32> currentOrderBread { get; set; }
+    [Networked] public NetworkString<_32> currentOrderMeat { get; set; }
+    [Networked] public NetworkString<_32> currentOrderCheese { get; set; }
+    [Networked] public int currentPlateStage { get; set; }
 
-    [Header("Prefabs 3D dos Ingredientes")]
-    public GameObject[] bread3DPrefabs;      // 3 pães 3D
-    public GameObject[] meat3DPrefabs;       // 3 carnes 3D
-    public GameObject[] cheese3DPrefabs;     // 3 queijos 3D
+    // ✅ FIX 2: detectar mudança nas networked vars pra atualizar a UI automaticamente
+    public override void Render()
+    {
+        UpdateOrderUI();
+    }
 
-    [Header("Referências das Mesas no Cenário")]
-    public Transform breadTable;
-    public Transform meatTable;
-    public Transform cheeseTable;
-
-    [Header("Skins dos Players")]
-    public NetworkObject breadSkin;
-    public NetworkObject meatSkin;
-    public NetworkObject cheeseSkin;
-
-    // Estado do jogo
-    [Networked] public string currentOrderBread { get; set; }
-    [Networked] public string currentOrderMeat { get; set; }
-    [Networked] public string currentOrderCheese { get; set; }
-    [Networked] public int currentPlateStage { get; set; } // 0=vazio, 1=temPao, 2=temCarne, 3=temQueijo
-
-    private NetworkObject currentPlate;
-    private GameObject currentPlateVisual;
-    private int playersConnected = 0;
     private int completedOrders = 0;
 
     private void Awake()
     {
-        if (Instance == null)
-            Instance = this;
+        if (Instance == null) Instance = this;
+        else Destroy(gameObject);
+    }
+
+    private void Start()
+    {
+        // Fallback: se não tiver Fusion rodando, gera pedido local mesmo
+        if (Runner == null)
+        {
+            Debug.Log("Modo offline - gerando pedido local");
+            GenerateNewOrderLocal();
+        }
+    }
+
+    private void GenerateNewOrderLocal()
+    {
+        // Versão sem Networked, só pra testar UI
+        string bread = breadOptions[Random.Range(0, breadOptions.Length)];
+        string meat = meatOptions[Random.Range(0, meatOptions.Length)];
+        string cheese = cheeseOptions[Random.Range(0, cheeseOptions.Length)];
+
+        if (orderText != null)
+            orderText.text = $"📋 PEDIDO\n\n🍞 {bread}\n🥩 {meat}\n🧀 {cheese}";
         else
-            Destroy(gameObject);
+            Debug.LogError("orderText é NULL!");
     }
 
     public override void Spawned()
     {
+        Debug.Log($"GameManager Spawned! HasStateAuthority: {Object.HasStateAuthority} | HasInputAuthority: {Object.HasInputAuthority}");
+
         if (Object.HasStateAuthority)
         {
             GenerateNewOrder();
-            SpawnInitialPlate();
+            Debug.Log("GenerateNewOrder chamado!");
         }
-    }
-
-    private void SpawnInitialPlate()
-    {
-        if (platePrefab != null && plateSpawnPoint != null)
+        else
         {
-            currentPlate = Runner.Spawn(platePrefab.GetComponent<NetworkObject>(), plateSpawnPoint.position, Quaternion.identity);
-            currentPlateStage = 0;
-        }
-    }
-
-    public void PlayerConnected()
-    {
-        if (!Object.HasStateAuthority) return;
-
-        playersConnected++;
-        RPC_ShowMessage($"Aguardando jogadores... ({playersConnected}/3)", Color.yellow);
-
-        if (playersConnected >= 3)
-        {
-            RPC_ShowMessage("Todos conectados! Vamos cozinhar!", Color.green);
+            Debug.LogWarning("GameManager NÃO tem StateAuthority! Pedido não foi gerado.");
         }
     }
 
@@ -96,228 +134,83 @@ public class GameManager : NetworkBehaviour
         currentOrderBread = breadOptions[Random.Range(0, breadOptions.Length)];
         currentOrderMeat = meatOptions[Random.Range(0, meatOptions.Length)];
         currentOrderCheese = cheeseOptions[Random.Range(0, cheeseOptions.Length)];
-
         currentPlateStage = 0;
 
-        // Reseta o prato
-        if (currentPlate != null && currentPlate.IsValid)
-        {
-            currentPlate.transform.position = plateSpawnPoint.position;
-        }
-
-        // Limpa visual do prato
-        if (currentPlateVisual != null)
-            Destroy(currentPlateVisual);
-
-        RPC_UpdateOrderUI(currentOrderBread, currentOrderMeat, currentOrderCheese);
-        RPC_ShowMessage($"📋 NOVO PEDIDO! {currentOrderBread} + {currentOrderMeat} + {currentOrderCheese}", Color.green);
+        Debug.Log($"Novo pedido: {currentOrderBread}, {currentOrderMeat}, {currentOrderCheese}");
     }
 
-    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    private void RPC_UpdateOrderUI(string bread, string meat, string cheese)
+    // ✅ FIX 2: UI atualizada via Render() que roda em todos os clientes
+    private void UpdateOrderUI()
     {
-        if (orderText != null)
-        {
-            orderText.text = $"📋 PEDIDO\n\n🍞 {bread}\n🥩 {meat}\n🧀 {cheese}";
-        }
+        if (orderText == null) return;
+
+        // Só atualiza se já tem dados
+        if (currentOrderBread.Length == 0) return;
+
+        orderText.text = $"📋 PEDIDO\n\n🍞 {currentOrderBread}\n🥩 {currentOrderMeat}\n🧀 {currentOrderCheese}";
     }
 
-    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    private void RPC_ShowMessage(string message, Color color)
+    // ✅ FIX 3: cliente envia RPC pro servidor em vez de chamar direto
+    public void TryAddIngredient(string ingredientName, PlayerRef player, RoleType playerRole)
     {
-        if (statusText != null)
-        {
-            statusText.text = message;
-            statusText.color = color;
-        }
-        Debug.Log(message);
+        RPC_RequestAddIngredient(ingredientName, player, (int)playerRole);
     }
 
-    public bool TryAddIngredient(string ingredient, PlayerRef player, RoleType playerRole)
+    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
+    private void RPC_RequestAddIngredient(string ingredientName, PlayerRef player, int roleInt)
     {
-        if (!Object.HasStateAuthority) return false;
+        RoleType playerRole = (RoleType)roleInt;
 
-        // Verifica se o jogador está na mesa certa
-        Transform playerTable = GetTableForRole(playerRole);
-        if (playerTable == null) return false;
-
-        // Verifica se o ingrediente é o correto para o pedido
         bool isCorrect = false;
-        string ingredientType = "";
+        string expectedType = "";
 
-        if (ingredient == currentOrderBread && playerRole == RoleType.BreadMaster)
-        {
-            isCorrect = true;
-            ingredientType = "bread";
-        }
-        else if (ingredient == currentOrderMeat && playerRole == RoleType.MeatMaster)
-        {
-            isCorrect = true;
-            ingredientType = "meat";
-        }
-        else if (ingredient == currentOrderCheese && playerRole == RoleType.CheeseMaster)
-        {
-            isCorrect = true;
-            ingredientType = "cheese";
-        }
+        if (ingredientName == currentOrderBread.Value && playerRole == RoleType.BreadMaster)
+        { isCorrect = true; expectedType = "bread"; }
+        else if (ingredientName == currentOrderMeat.Value && playerRole == RoleType.MeatMaster)
+        { isCorrect = true; expectedType = "meat"; }
+        else if (ingredientName == currentOrderCheese.Value && playerRole == RoleType.CheeseMaster)
+        { isCorrect = true; expectedType = "cheese"; }
 
         if (!isCorrect)
         {
-            RPC_ShowMessage($"❌ {ingredient} não é o ingrediente correto ou você não pode pegar ele!", Color.red);
-            return false;
+            RPC_ShowMessage($"❌ {ingredientName} não é o ingrediente correto para {playerRole}!");
+            return;
         }
 
-        // Avança o estágio do prato
-        int newStage = currentPlateStage + 1;
+        int expectedStage = expectedType switch
+        {
+            "bread" => 1,
+            "meat" => 2,
+            "cheese" => 3,
+            _ => -1
+        };
 
-        if (newStage == 1 && ingredientType == "bread")
+        if (currentPlateStage + 1 != expectedStage)
         {
-            currentPlateStage = 1;
-            TeleportPlateToBreadTable();
-            AddIngredientToPlate(ingredient, ingredientType);
-            RPC_ShowMessage($"✅ {ingredient} adicionado ao prato!", Color.green);
+            RPC_ShowMessage($"⚠️ Ordem errada! A ordem é: Pão → Carne → Queijo");
+            return;
         }
-        else if (newStage == 2 && ingredientType == "meat" && currentPlateStage == 1)
-        {
-            currentPlateStage = 2;
-            TeleportPlateToMeatTable();
-            AddIngredientToPlate(ingredient, ingredientType);
-            RPC_ShowMessage($"✅ {ingredient} adicionado ao prato!", Color.green);
-        }
-        else if (newStage == 3 && ingredientType == "cheese" && currentPlateStage == 2)
-        {
-            currentPlateStage = 3;
-            TeleportPlateToCheeseTable();
-            AddIngredientToPlate(ingredient, ingredientType);
-            RPC_ShowMessage($"✅ {ingredient} adicionado ao prato!", Color.green);
 
-            // Pedido completo!
+        currentPlateStage = expectedStage;
+        RPC_ShowMessage($"✅ {ingredientName} adicionado!");
+
+        if (currentPlateStage == 3)
+        {
             completedOrders++;
             RPC_OrderComplete(completedOrders);
             GenerateNewOrder();
         }
-        else
-        {
-            RPC_ShowMessage($"⚠️ Não é a vez deste ingrediente! Ordme correta: PÃO → CARNE → QUEIJO", Color.yellow);
-            return false;
-        }
-
-        return true;
     }
 
-    private void TeleportPlateToBreadTable()
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    private void RPC_ShowMessage(string msg)
     {
-        if (currentPlate != null && breadTablePlatePoint != null)
-        {
-            currentPlate.transform.position = breadTablePlatePoint.position;
-        }
-    }
-
-    private void TeleportPlateToMeatTable()
-    {
-        if (currentPlate != null && meatTablePlatePoint != null)
-        {
-            currentPlate.transform.position = meatTablePlatePoint.position;
-        }
-    }
-
-    private void TeleportPlateToCheeseTable()
-    {
-        if (currentPlate != null && cheeseTablePlatePoint != null)
-        {
-            currentPlate.transform.position = cheeseTablePlatePoint.position;
-        }
-    }
-
-    private void AddIngredientToPlate(string ingredientName, string type)
-    {
-        // Instancia o modelo 3D do ingrediente em cima do prato
-        GameObject prefabToSpawn = null;
-
-        if (type == "bread")
-        {
-            foreach (var bread in bread3DPrefabs)
-            {
-                if (bread.name.Contains(ingredientName))
-                {
-                    prefabToSpawn = bread;
-                    break;
-                }
-            }
-        }
-        else if (type == "meat")
-        {
-            foreach (var meat in meat3DPrefabs)
-            {
-                if (meat.name.Contains(ingredientName))
-                {
-                    prefabToSpawn = meat;
-                    break;
-                }
-            }
-        }
-        else if (type == "cheese")
-        {
-            foreach (var cheese in cheese3DPrefabs)
-            {
-                if (cheese.name.Contains(ingredientName))
-                {
-                    prefabToSpawn = cheese;
-                    break;
-                }
-            }
-        }
-
-        if (prefabToSpawn != null && currentPlate != null)
-        {
-            GameObject ingredientObj = Instantiate(prefabToSpawn, currentPlate.transform);
-            ingredientObj.transform.localPosition = new Vector3(0, 0.2f + (currentPlateStage * 0.1f), 0);
-            ingredientObj.transform.localRotation = Quaternion.identity;
-            ingredientObj.transform.localScale = Vector3.one * 0.5f;
-
-            if (currentPlateVisual == null)
-                currentPlateVisual = ingredientObj;
-        }
+        Debug.Log(msg);
     }
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
     private void RPC_OrderComplete(int orders)
     {
-        if (statusText != null)
-        {
-            statusText.text = $"🎉 PEDIDO COMPLETO! Pedidos: {orders} 🎉";
-            statusText.color = Color.cyan;
-        }
         Debug.Log($"🎉 PEDIDO COMPLETO! Total: {orders}");
-    }
-
-    public Transform GetTableForRole(RoleType role)
-    {
-        switch (role)
-        {
-            case RoleType.BreadMaster: return breadTable;
-            case RoleType.MeatMaster: return meatTable;
-            case RoleType.CheeseMaster: return cheeseTable;
-            default: return null;
-        }
-    }
-
-    public NetworkObject GetSkinForRole(RoleType role)
-    {
-        switch (role)
-        {
-            case RoleType.BreadMaster: return breadSkin;
-            case RoleType.MeatMaster: return meatSkin;
-            case RoleType.CheeseMaster: return cheeseSkin;
-            default: return null;
-        }
-    }
-
-    public bool IsPlayerAtCorrectTable(Transform playerPos, RoleType role)
-    {
-        Transform targetTable = GetTableForRole(role);
-        if (targetTable == null) return true;
-
-        return Vector3.Distance(playerPos.position, targetTable.position) < 3f;
     }
 }
