@@ -1,5 +1,6 @@
 ﻿using Fusion;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public enum RoleType { BreadMaster, MeatMaster, CheeseMaster }
 
@@ -19,12 +20,11 @@ public class PlayerRole : NetworkBehaviour
 
     private void Update()
     {
-        // ✅ mesma correção do PlayerInteraction
         if (Object == null || !Object.HasInputAuthority) return;
 
-        if (Input.GetKeyDown(KeyCode.Alpha1)) { MyRole = RoleType.BreadMaster; Debug.Log("Role: BreadMaster"); }
-        if (Input.GetKeyDown(KeyCode.Alpha2)) { MyRole = RoleType.MeatMaster; Debug.Log("Role: MeatMaster"); }
-        if (Input.GetKeyDown(KeyCode.Alpha3)) { MyRole = RoleType.CheeseMaster; Debug.Log("Role: CheeseMaster"); }
+        if (Keyboard.current.digit1Key.wasPressedThisFrame) { MyRole = RoleType.BreadMaster; Debug.Log("Role: BreadMaster"); }
+        if (Keyboard.current.digit2Key.wasPressedThisFrame) { MyRole = RoleType.MeatMaster; Debug.Log("Role: MeatMaster"); }
+        if (Keyboard.current.digit3Key.wasPressedThisFrame) { MyRole = RoleType.CheeseMaster; Debug.Log("Role: CheeseMaster"); }
     }
 
     public bool CanPickupByTag(string tag)

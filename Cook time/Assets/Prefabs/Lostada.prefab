@@ -11,11 +11,13 @@ GameObject:
   - component: {fileID: 4795873152011274673}
   - component: {fileID: 8462149804170209291}
   - component: {fileID: 3018257931049938836}
+  - component: {fileID: 6958543402223652822}
   - component: {fileID: 5015262562335557298}
   - component: {fileID: 5336105309819924827}
   - component: {fileID: 7540076392044742199}
+  - component: {fileID: 8350839873907152254}
+  - component: {fileID: 3677597570735615677}
   - component: {fileID: 2614540125051018991}
-  - component: {fileID: 8926476138453436608}
   m_Layer: 0
   m_Name: Lostada
   m_TagString: Untagged
@@ -96,6 +98,18 @@ MonoBehaviour:
   m_DefaultActionMap: Player
   m_SplitScreenIndex: -1
   m_Camera: {fileID: 0}
+--- !u!114 &6958543402223652822
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2226707638039570710}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 23b5d153ba571604c99a36af4f754449, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerSetup
 --- !u!114 &5015262562335557298
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -161,6 +175,32 @@ MonoBehaviour:
   analogMovement: 0
   cursorLocked: 1
   cursorInputForLook: 1
+--- !u!114 &8350839873907152254
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2226707638039570710}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 912df8e949236bb439a92f40f90a72f3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerInteraction
+  interactionRange: 3
+--- !u!114 &3677597570735615677
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2226707638039570710}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b166e50cc46b71544aa0ad18e58b950c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerRole
+  _MyRole: 0
 --- !u!114 &2614540125051018991
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -178,25 +218,10 @@ MonoBehaviour:
   Flags: 262145
   NestedObjects: []
   NetworkedBehaviours:
-  - {fileID: 8926476138453436608}
+  - {fileID: 6958543402223652822}
+  - {fileID: 8350839873907152254}
+  - {fileID: 3677597570735615677}
   ForceRemoteRenderTimeframe: 0
---- !u!114 &8926476138453436608
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2226707638039570710}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 158639473, guid: e725a070cec140c4caffb81624c8c787, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Fusion.Runtime.dll::Fusion.NetworkTransform
-  _stateAuthorityChangeErrorCorrectionDelta: 0
-  SyncScale: 0
-  SyncParent: 0
-  _autoAOIOverride: 1
-  DisableSharedModeInterpolation: 0
 --- !u!1 &2933050612194642713
 GameObject:
   m_ObjectHideFlags: 0

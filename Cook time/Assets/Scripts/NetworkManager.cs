@@ -20,6 +20,10 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
 
     private void Start()
     {
+        // Fix cursor
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+
         hostButton?.onClick.AddListener(() => StartGame(GameMode.Host));
         joinButton?.onClick.AddListener(() => StartGame(GameMode.Client));
     }
@@ -63,7 +67,8 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
     {
         if (runner.IsServer)
         {
-            Vector3 pos = new Vector3(Random.Range(-3f, 3f), 1f, Random.Range(-3f, 3f));
+            // Troca o y=1 pela altura correta do seu chão
+            Vector3 pos = new Vector3(Random.Range(-3f, 3f), 0f, Random.Range(-3f, 3f));
             runner.Spawn(playerPrefab, pos, Quaternion.identity, player);
         }
     }
