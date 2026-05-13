@@ -21,6 +21,10 @@ public class PlayerRole : NetworkBehaviour
 
         if (Object.HasInputAuthority)
         {
+            // Atribui papel baseado no número do jogador na sala
+            int playerIndex = (Runner.LocalPlayer.PlayerId - 1) % 3;
+            MyRole = (RoleType)playerIndex;
+
             Debug.Log($"🎭 Meu papel é: {MyRole}");
         }
     }
