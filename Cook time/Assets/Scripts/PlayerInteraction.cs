@@ -59,7 +59,6 @@ public class PlayerInteraction : NetworkBehaviour
                     return;
                 }
 
-                // Verifica se é o ingrediente certo do pedido antes de sumir
                 if (GameManager.Instance == null) return;
 
                 bool isCorrect = GameManager.Instance.IsCorrectIngredient(hit.collider.name, myRole.MyRole);
@@ -70,13 +69,6 @@ public class PlayerInteraction : NetworkBehaviour
                 }
 
                 GameManager.Instance.TryAddIngredient(hit.collider.name, Runner.LocalPlayer, myRole.MyRole);
-                GameManager.Instance.RemoveIngredient(hit.collider.gameObject, myRole.MyRole);
-
-                NetworkObject netObj = ingredient.GetComponent<NetworkObject>();
-                if (netObj != null)
-                    Runner.Despawn(netObj);
-                else
-                    Destroy(hit.collider.gameObject);
             }
         }
     }

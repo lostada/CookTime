@@ -1732,14 +1732,12 @@ MonoBehaviour:
   breadOptions:
   - PaoAustraliano
   - PaoBrioche
-  - PaoDeManteiga
   meatOptions:
   - CalabresaAcebolada
   - Frango
   - CarneMoida
   cheeseOptions:
   - QueijoPrato
-  - Mussarela
   - Cheddar
   breadObjects:
   - {fileID: 562345511}

@@ -84,7 +84,6 @@ public class GameManager : NetworkBehaviour
         orderText.text = $"PEDIDO\n\nPao: {currentOrderBread}\nCarne: {currentOrderMeat}\nQueijo: {currentOrderCheese}";
     }
 
-    // Verifica se o ingrediente é o correto do pedido atual
     public bool IsCorrectIngredient(string ingredientName, RoleType role)
     {
         return (role == RoleType.BreadMaster && ingredientName == currentOrderBread.Value) ||
@@ -92,7 +91,6 @@ public class GameManager : NetworkBehaviour
                (role == RoleType.CheeseMaster && ingredientName == currentOrderCheese.Value);
     }
 
-    // Retorna o ingrediente atual do pedido para o role
     public string GetCurrentOrder(RoleType role)
     {
         return role switch
@@ -136,13 +134,22 @@ public class GameManager : NetworkBehaviour
             for (int i = 0; i < cheeseObjects.Length; i++) { if (cheeseObjects[i] == obj) { cheeseObjects[i] = null; return; } }
     }
 
+    // ✅ CORREÇÃO: Host chama ProcessIngredient direto, cliente usa RPC
     public void TryAddIngredient(string ingredientName, PlayerRef player, RoleType playerRole)
     {
-        RPC_RequestAddIngredient(ingredientName, player, (int)playerRole);
+        if (Object.HasStateAuthority)
+            ProcessIngredient(ingredientName, player, (int)playerRole);
+        else
+            RPC_RequestAddIngredient(ingredientName, player, (int)playerRole);
     }
 
     [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
     private void RPC_RequestAddIngredient(string ingredientName, PlayerRef player, int roleInt)
+    {
+        ProcessIngredient(ingredientName, player, roleInt);
+    }
+
+    private void ProcessIngredient(string ingredientName, PlayerRef player, int roleInt)
     {
         RoleType playerRole = (RoleType)roleInt;
         string expectedType = "";
@@ -156,7 +163,7 @@ public class GameManager : NetworkBehaviour
 
         if (currentPlateStage + 1 != expectedStage)
         {
-            RPC_ShowMessage($"Ordem errada! A ordem e: Pao -> Carne -> Queijo");
+            RPC_ShowMessage("Ordem errada! A ordem e: Pao -> Carne -> Queijo");
             return;
         }
 
