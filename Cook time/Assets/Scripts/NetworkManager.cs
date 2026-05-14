@@ -2,91 +2,86 @@
 using Fusion.Sockets;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
-using TMPro;
+using UnityEngine.InputSystem;
 
 public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
 {
-    [Header("UI")]
-    [SerializeField] private Button hostButton;
-    [SerializeField] private Button joinButton;
-    [SerializeField] private TMP_InputField roomInput;
-    [SerializeField] private TextMeshProUGUI statusText;
+    [Header("Players (ordem de entrada)")]
+    [SerializeField] private NetworkObject prefabNeckel;
+    [SerializeField] private NetworkObject prefabLostada;
+    [SerializeField] private NetworkObject prefabVentura;
 
-    [Header("Player")]
-    [SerializeField] private NetworkObject playerPrefab;
+    [Header("Spawn Points")]
+    [SerializeField] private Transform spawnPoint1;
+    [SerializeField] private Transform spawnPoint2;
+    [SerializeField] private Transform spawnPoint3;
 
+    private int _playerCount = 0;
     private NetworkRunner _runner;
 
-    private void Start()
+    public void SetRunner(NetworkRunner runner)
     {
-        // Fix cursor
-        Cursor.lockState = CursorLockMode.None;
-        Cursor.visible = true;
-
-        hostButton?.onClick.AddListener(() => StartGame(GameMode.Host));
-        joinButton?.onClick.AddListener(() => StartGame(GameMode.Client));
-    }
-
-    private async void StartGame(GameMode mode)
-    {
-        SetStatus("Conectando...");
-
-        var go = new GameObject("NetworkRunner");
-        DontDestroyOnLoad(go);
-
-        _runner = go.AddComponent<NetworkRunner>();
-        _runner.ProvideInput = true;
+        _runner = runner;
         _runner.AddCallbacks(this);
-
-        string room = string.IsNullOrEmpty(roomInput?.text) ? "Sala1" : roomInput.text;
-
-        var result = await _runner.StartGame(new StartGameArgs
-        {
-            GameMode = mode,
-            SessionName = room,
-            Scene = SceneRef.FromIndex(
-                UnityEngine.SceneManagement.SceneManager.GetActiveScene().buildIndex),
-            SceneManager = go.AddComponent<NetworkSceneManagerDefault>()
-        });
-
-        if (result.Ok)
-        {
-            SetStatus($"Conectado! Sala: {room}");
-            hostButton?.gameObject.SetActive(false);
-            joinButton?.gameObject.SetActive(false);
-        }
-        else
-        {
-            SetStatus($"Erro: {result.ShutdownReason}");
-        }
+        Debug.Log("NetworkManager registrado no runner via SetRunner!");
     }
 
-    // Spawna o player quando alguém entra
+    private void SpawnPlayer(NetworkRunner runner, PlayerRef player)
+    {
+        _playerCount++;
+        NetworkObject prefab = _playerCount switch
+        {
+            1 => prefabNeckel,
+            2 => prefabLostada,
+            3 => prefabVentura,
+            _ => prefabNeckel
+        };
+        Transform spawnPoint = _playerCount switch
+        {
+            1 => spawnPoint1,
+            2 => spawnPoint2,
+            3 => spawnPoint3,
+            _ => spawnPoint1
+        };
+
+        if (prefab == null) { Debug.LogError($"Prefab {_playerCount} nao preenchido!"); return; }
+
+        Vector3 pos = spawnPoint != null ? spawnPoint.position : Vector3.zero;
+        Quaternion rot = spawnPoint != null ? spawnPoint.rotation : Quaternion.identity;
+        runner.Spawn(prefab, pos, rot, player);
+        Debug.Log($"Jogador {_playerCount} spawnado em {pos} como {prefab.name}");
+    }
+
     public void OnPlayerJoined(NetworkRunner runner, PlayerRef player)
     {
-        if (runner.IsServer)
-        {
-            // Troca o y=1 pela altura correta do seu chão
-            Vector3 pos = new Vector3(Random.Range(-3f, 3f), 0f, Random.Range(-3f, 3f));
-            runner.Spawn(playerPrefab, pos, Quaternion.identity, player);
-        }
+        if (!runner.IsServer) return;
+        SpawnPlayer(runner, player);
     }
 
-    // Envia input pro Fusion
+    // ✅ CORRIGIDO: coleta o input a cada tick do Fusion
     public void OnInput(NetworkRunner runner, NetworkInput input)
     {
-        // PlayerController lê Input direto no FixedUpdateNetwork
-        // esse callback precisa existir mas pode ficar vazio
+        var data = new NetworkInputData();
+
+        if (Keyboard.current != null)
+        {
+            float h = 0f, v = 0f;
+            if (Keyboard.current.wKey.isPressed) v = 1f;
+            if (Keyboard.current.sKey.isPressed) v = -1f;
+            if (Keyboard.current.aKey.isPressed) h = -1f;
+            if (Keyboard.current.dKey.isPressed) h = 1f;
+            data.moveDirection = new Vector2(h, v);
+        }
+
+        if (Mouse.current != null)
+            data.lookDelta = Mouse.current.delta.ReadValue();
+
+        data.buttons.Set(PlayerButton.Jump, Keyboard.current != null && Keyboard.current.spaceKey.isPressed);
+
+        input.Set(data);
     }
 
-    private void SetStatus(string msg)
-    {
-        if (statusText != null) statusText.text = msg;
-        Debug.Log(msg);
-    }
-
-    public void OnPlayerLeft(NetworkRunner r, PlayerRef p) { }
+    public void OnPlayerLeft(NetworkRunner r, PlayerRef p) { _playerCount--; }
     public void OnInputMissing(NetworkRunner r, PlayerRef p, NetworkInput i) { }
     public void OnShutdown(NetworkRunner r, ShutdownReason reason) { }
     public void OnConnectedToServer(NetworkRunner r) { }

@@ -6,7 +6,7 @@ public class GameManager : NetworkBehaviour
 {
     public static GameManager Instance;
 
-    [Header("Opções de cada jogador")]
+    [Header("Opcoes de cada jogador")]
     public string[] breadOptions = { "PaoAustraliano", "PaoBrioche" };
     public string[] meatOptions = { "CalabresaAcebolada", "Frango", "CarneMoida" };
     public string[] cheeseOptions = { "QueijoPrato", "Cheddar" };
@@ -18,11 +18,18 @@ public class GameManager : NetworkBehaviour
 
     [Header("UI")]
     public TextMeshProUGUI orderText;
+    public TextMeshProUGUI plateText;
+    public TextMeshProUGUI timerText;
+
+    [Header("Timer")]
+    public float totalTime = 120f; // tempo total em segundos
 
     [Networked] public NetworkString<_32> currentOrderBread { get; set; }
     [Networked] public NetworkString<_32> currentOrderMeat { get; set; }
     [Networked] public NetworkString<_32> currentOrderCheese { get; set; }
     [Networked] public int currentPlateStage { get; set; }
+    [Networked] public float timeRemaining { get; set; }
+    [Networked] public bool gameOver { get; set; }
 
     private int completedOrders = 0;
 
@@ -46,14 +53,33 @@ public class GameManager : NetworkBehaviour
         Debug.Log($"GameManager Spawned! HasStateAuthority: {Object.HasStateAuthority}");
         if (Object.HasStateAuthority)
         {
+            timeRemaining = totalTime;
+            gameOver = false;
             GenerateNewOrder();
             Debug.Log("GenerateNewOrder chamado!");
+        }
+    }
+
+    public override void FixedUpdateNetwork()
+    {
+        if (!Object.HasStateAuthority) return;
+        if (gameOver) return;
+
+        timeRemaining -= Runner.DeltaTime;
+
+        if (timeRemaining <= 0f)
+        {
+            timeRemaining = 0f;
+            gameOver = true;
+            RPC_GameOver(completedOrders);
         }
     }
 
     public override void Render()
     {
         UpdateOrderUI();
+        UpdatePlateUI();
+        UpdateTimerUI();
     }
 
     public void GenerateNewOrder()
@@ -74,7 +100,7 @@ public class GameManager : NetworkBehaviour
         if (orderText != null)
             orderText.text = $"PEDIDO\n\nPao: {bread}\nCarne: {meat}\nQueijo: {cheese}";
         else
-            Debug.LogError("orderText é NULL!");
+            Debug.LogError("orderText e NULL!");
     }
 
     private void UpdateOrderUI()
@@ -82,6 +108,31 @@ public class GameManager : NetworkBehaviour
         if (orderText == null) return;
         if (currentOrderBread.Length == 0) return;
         orderText.text = $"PEDIDO\n\nPao: {currentOrderBread}\nCarne: {currentOrderMeat}\nQueijo: {currentOrderCheese}";
+    }
+
+    private void UpdatePlateUI()
+    {
+        if (plateText == null) return;
+        if (currentOrderBread.Length == 0) return;
+
+        string pao = currentPlateStage >= 1 ? $"{currentOrderBread} [OK]" : "aguardando...";
+        string carne = currentPlateStage >= 2 ? $"{currentOrderMeat} [OK]" : "aguardando...";
+        string queijo = currentPlateStage >= 3 ? $"{currentOrderCheese} [OK]" : "aguardando...";
+
+        plateText.text = $"PAO\n\nPao: {pao}\nCarne: {carne}\nQueijo: {queijo}";
+    }
+
+    private void UpdateTimerUI()
+    {
+        if (timerText == null) return;
+
+        int mins = Mathf.FloorToInt(timeRemaining / 60f);
+        int secs = Mathf.FloorToInt(timeRemaining % 60f);
+
+        timerText.text = $"Tempo: {mins:00}:{secs:00}";
+
+        // Fica vermelho nos ultimos 30 segundos
+        timerText.color = timeRemaining <= 30f ? Color.red : Color.white;
     }
 
     public bool IsCorrectIngredient(string ingredientName, RoleType role)
@@ -134,9 +185,10 @@ public class GameManager : NetworkBehaviour
             for (int i = 0; i < cheeseObjects.Length; i++) { if (cheeseObjects[i] == obj) { cheeseObjects[i] = null; return; } }
     }
 
-    // ✅ CORREÇÃO: Host chama ProcessIngredient direto, cliente usa RPC
     public void TryAddIngredient(string ingredientName, PlayerRef player, RoleType playerRole)
     {
+        if (gameOver) return;
+
         if (Object.HasStateAuthority)
             ProcessIngredient(ingredientName, player, (int)playerRole);
         else
@@ -151,24 +203,16 @@ public class GameManager : NetworkBehaviour
 
     private void ProcessIngredient(string ingredientName, PlayerRef player, int roleInt)
     {
+        if (gameOver) return;
+
         RoleType playerRole = (RoleType)roleInt;
-        string expectedType = "";
 
-        if (ingredientName == currentOrderBread.Value && playerRole == RoleType.BreadMaster) expectedType = "bread";
-        else if (ingredientName == currentOrderMeat.Value && playerRole == RoleType.MeatMaster) expectedType = "meat";
-        else if (ingredientName == currentOrderCheese.Value && playerRole == RoleType.CheeseMaster) expectedType = "cheese";
-        else { RPC_ShowMessage($"❌ {ingredientName} não é o ingrediente correto!"); return; }
+        if (ingredientName == currentOrderBread.Value && playerRole == RoleType.BreadMaster) currentPlateStage = 1;
+        else if (ingredientName == currentOrderMeat.Value && playerRole == RoleType.MeatMaster) currentPlateStage = 2;
+        else if (ingredientName == currentOrderCheese.Value && playerRole == RoleType.CheeseMaster) currentPlateStage = 3;
+        else { RPC_ShowMessage("Ingrediente errado ou role errada!"); return; }
 
-        int expectedStage = expectedType switch { "bread" => 1, "meat" => 2, "cheese" => 3, _ => -1 };
-
-        if (currentPlateStage + 1 != expectedStage)
-        {
-            RPC_ShowMessage("Ordem errada! A ordem e: Pao -> Carne -> Queijo");
-            return;
-        }
-
-        currentPlateStage = expectedStage;
-        RPC_ShowMessage($"✅ {ingredientName} adicionado!");
+        RPC_ShowMessage($"{ingredientName} adicionado! Stage: {currentPlateStage}/3");
 
         if (currentPlateStage == 3)
         {
@@ -183,4 +227,7 @@ public class GameManager : NetworkBehaviour
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
     private void RPC_OrderComplete(int orders) { Debug.Log($"PEDIDO COMPLETO! Total: {orders}"); }
+
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    private void RPC_GameOver(int totalOrders) { Debug.Log($"FIM DE JOGO! Pedidos completos: {totalOrders}"); }
 }

@@ -188,12 +188,15 @@ GameObject:
   m_Component:
   - component: {fileID: 4037031442485468258}
   - component: {fileID: 5301199322418611567}
+  - component: {fileID: -4648553070019623873}
+  - component: {fileID: 6788348609723501014}
   - component: {fileID: 7752128797855533005}
   - component: {fileID: 8444761001464382551}
   - component: {fileID: 4201171246857705814}
   - component: {fileID: 8847526861242249279}
-  - component: {fileID: -8215623502826255223}
   - component: {fileID: -1328558990842908759}
+  - component: {fileID: -1701034758523860827}
+  - component: {fileID: 7890226413648609354}
   m_Layer: 0
   m_Name: Neckel
   m_TagString: Untagged
@@ -244,6 +247,42 @@ CharacterController:
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
   m_Center: {x: 0.01, y: 0.52, z: -0.02}
+--- !u!114 &-4648553070019623873
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1944692621596970290}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4a0b57fb82205a3499ce9cfb48362b14, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EmojiSystem
+  emojiPrefabs:
+  - {fileID: -2161899937823599655, guid: b938019031c2a7a4c90d99cca9ab41b1, type: 3}
+  - {fileID: 2903333449378537173, guid: 24bb9e01b502e4042bdf74e9a3f4c3a5, type: 3}
+  - {fileID: 10026312746321577, guid: 26e6d9bfa0e0bc448ac90ae20b42074f, type: 3}
+  - {fileID: -561491465972868999, guid: cc21f7c8f00f3cd4b8f339f9d030ff42, type: 3}
+  - {fileID: 35334939900926243, guid: 8d36c117745d5d540a8a975c5d38d809, type: 3}
+  - {fileID: 6209046767455799958, guid: 99b540edcdb6a774eb6136ed0dd71522, type: 3}
+  - {fileID: -5964512375290701935, guid: db0ab958ddddbb3459e9c18e38c3ecfa, type: 3}
+  - {fileID: 8007169053046525922, guid: 0b5f2e370718d1b4bb920953f936c953, type: 3}
+  emojiSpawnPoint: {fileID: 6189157440917773089}
+  emojiDuration: 3
+--- !u!114 &6788348609723501014
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1944692621596970290}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 912df8e949236bb439a92f40f90a72f3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerInteraction
+  interactionRange: 3
 --- !u!114 &7752128797855533005
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -287,13 +326,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   MoveSpeed: 4
-  SprintSpeed: 6
-  RotationSpeed: 1
+  RotationSpeed: 6.7
   SpeedChangeRate: 10
-  JumpHeight: 1.2
   Gravity: -15
-  JumpTimeout: 0.1
-  FallTimeout: 0.15
   Grounded: 1
   GroundedOffset: 0.23
   GroundedRadius: 0.61
@@ -339,23 +374,6 @@ MonoBehaviour:
   analogMovement: 0
   cursorLocked: 1
   cursorInputForLook: 1
---- !u!114 &-8215623502826255223
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1944692621596970290}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 158639473, guid: e725a070cec140c4caffb81624c8c787, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Fusion.Runtime.dll::Fusion.NetworkTransform
-  _stateAuthorityChangeErrorCorrectionDelta: 0
-  SyncScale: 0
-  SyncParent: 0
-  _autoAOIOverride: 1
-  DisableSharedModeInterpolation: 0
 --- !u!114 &-1328558990842908759
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -373,8 +391,36 @@ MonoBehaviour:
   Flags: 262145
   NestedObjects: []
   NetworkedBehaviours:
-  - {fileID: -8215623502826255223}
+  - {fileID: -4648553070019623873}
+  - {fileID: 6788348609723501014}
+  - {fileID: -1701034758523860827}
+  - {fileID: 7890226413648609354}
   ForceRemoteRenderTimeframe: 0
+--- !u!114 &-1701034758523860827
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1944692621596970290}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b166e50cc46b71544aa0ad18e58b950c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerRole
+  _MyRole: 0
+--- !u!114 &7890226413648609354
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1944692621596970290}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 23b5d153ba571604c99a36af4f754449, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerSetup
 --- !u!1 &6021001038201763880
 GameObject:
   m_ObjectHideFlags: 0
@@ -575,7 +621,8 @@ Transform:
   m_LocalPosition: {x: -0.072, y: 0, z: 0}
   m_LocalScale: {x: 46.945507, y: 46.945507, z: 46.945507}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 6189157440917773089}
   m_Father: {fileID: 306032909910643864}
   m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
 --- !u!33 &8989802686199684901
@@ -634,6 +681,37 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!1 &7735331005379194994
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6189157440917773089}
+  m_Layer: 0
+  m_Name: Emoji
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6189157440917773089
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7735331005379194994}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
+  m_LocalPosition: {x: 0, y: 0.031199997, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 7508161135675406351}
+  m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
 --- !u!1 &8262313592413525910
 GameObject:
   m_ObjectHideFlags: 0

@@ -1,4 +1,4 @@
-using Fusion;
+﻿using Fusion;
 using UnityEngine;
 
 public enum PlayerButton
@@ -10,5 +10,6 @@ public enum PlayerButton
 public struct NetworkInputData : INetworkInput
 {
     public Vector2 moveDirection;
+    public Vector2 lookDelta;
     public NetworkButtons buttons;
 }

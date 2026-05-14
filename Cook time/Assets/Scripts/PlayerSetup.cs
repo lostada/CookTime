@@ -1,31 +1,37 @@
-using Fusion;
+ï»¿using Fusion;
 using StarterAssets;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 public class PlayerSetup : NetworkBehaviour
 {
-    private FirstPersonController fpc;
-    private PlayerInput playerInput;
+    private FirstPersonController _fpc;
 
     public override void Spawned()
     {
-        fpc = GetComponent<FirstPersonController>();
-        playerInput = GetComponent<PlayerInput>();
+        _fpc = GetComponent<FirstPersonController>();
 
         if (Object.HasInputAuthority)
         {
-            // Player local — ativa tudo
-            fpc.enabled = true;
-            Debug.Log("Player local — controles ativados!");
+            // âœ… Sem coroutine â€” ativa direto e de forma confiÃ¡vel
+            _fpc.enabled = true;
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+            Debug.Log("Player local â€” controles ativados!");
         }
         else
         {
-            // Player remoto — desativa tudo
-            fpc.enabled = false;
-            if (playerInput != null) playerInput.enabled = false;
+            _fpc.enabled = false;
             GetComponentInChildren<Camera>()?.gameObject.SetActive(false);
-            Debug.Log("Player remoto — controles desativados!");
+            Debug.Log("Player remoto â€” controles desativados!");
         }
+    }
+
+    public override void FixedUpdateNetwork()
+    {
+        // âœ… Pega o input que o Fusion coletou no OnInput e passa pro FPC
+        if (!Object.HasInputAuthority) return;
+        if (!GetInput(out NetworkInputData input)) return;
+
+        _fpc.SetInput(input.moveDirection, input.lookDelta);
     }
 }

@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4795873152011274673}
   - component: {fileID: 8462149804170209291}
+  - component: {fileID: -7538004854005939485}
   - component: {fileID: 3018257931049938836}
   - component: {fileID: 6958543402223652822}
   - component: {fileID: 5015262562335557298}
@@ -68,6 +69,29 @@ CharacterController:
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
   m_Center: {x: 0.01, y: 0.52, z: -0.02}
+--- !u!114 &-7538004854005939485
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2226707638039570710}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4a0b57fb82205a3499ce9cfb48362b14, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EmojiSystem
+  emojiPrefabs:
+  - {fileID: -2161899937823599655, guid: b938019031c2a7a4c90d99cca9ab41b1, type: 3}
+  - {fileID: 2903333449378537173, guid: 24bb9e01b502e4042bdf74e9a3f4c3a5, type: 3}
+  - {fileID: 10026312746321577, guid: 26e6d9bfa0e0bc448ac90ae20b42074f, type: 3}
+  - {fileID: -561491465972868999, guid: cc21f7c8f00f3cd4b8f339f9d030ff42, type: 3}
+  - {fileID: 35334939900926243, guid: 8d36c117745d5d540a8a975c5d38d809, type: 3}
+  - {fileID: 6209046767455799958, guid: 99b540edcdb6a774eb6136ed0dd71522, type: 3}
+  - {fileID: -5964512375290701935, guid: db0ab958ddddbb3459e9c18e38c3ecfa, type: 3}
+  - {fileID: 8007169053046525922, guid: 0b5f2e370718d1b4bb920953f936c953, type: 3}
+  emojiHeight: 2
+  emojiDuration: 3
 --- !u!114 &3018257931049938836
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -123,13 +147,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   MoveSpeed: 4
-  SprintSpeed: 6
   RotationSpeed: 1
   SpeedChangeRate: 10
-  JumpHeight: 1.2
   Gravity: -15
-  JumpTimeout: 0.1
-  FallTimeout: 0.15
   Grounded: 1
   GroundedOffset: 0.23
   GroundedRadius: 0.61
@@ -200,7 +220,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b166e50cc46b71544aa0ad18e58b950c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerRole
-  _MyRole: 0
+  _MyRole: 1
 --- !u!114 &2614540125051018991
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -218,6 +238,7 @@ MonoBehaviour:
   Flags: 262145
   NestedObjects: []
   NetworkedBehaviours:
+  - {fileID: -7538004854005939485}
   - {fileID: 6958543402223652822}
   - {fileID: 8350839873907152254}
   - {fileID: 3677597570735615677}

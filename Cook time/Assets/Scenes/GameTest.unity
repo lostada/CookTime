@@ -699,7 +699,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Pedido:'
+  m_text: 
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -764,7 +764,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 0, y: 0, z: 0, w: 0}
+  m_margin: {x: -98.409935, y: -90.762146, z: -262.0953, w: -120.51767}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -1323,7 +1323,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Pedido:'
+  m_text: 
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -1388,7 +1388,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 0, y: 0, z: 0, w: 0}
+  m_margin: {x: -316.1126, y: -91.8434, z: -95.05604, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -1435,7 +1435,9 @@ MonoBehaviour:
   joinButton: {fileID: 479098878}
   roomInput: {fileID: 0}
   statusText: {fileID: 1143026978}
-  playerPrefab: {fileID: 2614540125051018991, guid: c198b419279e1d547ad97e6513c79bc1, type: 3}
+  prefabNeckel: {fileID: -1328558990842908759, guid: 8a81fd1be3388b342bc40faefba8a9f7, type: 3}
+  prefabLostada: {fileID: 2614540125051018991, guid: c198b419279e1d547ad97e6513c79bc1, type: 3}
+  prefabVentura: {fileID: 3993347121148931887, guid: 27f7ec424fa46534d9bd29c5e28e86fd, type: 3}
 --- !u!4 &1178233915
 Transform:
   m_ObjectHideFlags: 0

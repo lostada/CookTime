@@ -447,12 +447,16 @@ GameObject:
   m_Component:
   - component: {fileID: 7901115767149416932}
   - component: {fileID: 1159384991406263115}
+  - component: {fileID: -883407466442919321}
+  - component: {fileID: -5172753122739088488}
   - component: {fileID: 1512943388093406324}
   - component: {fileID: 8903646808148028787}
   - component: {fileID: 6433469955576485751}
   - component: {fileID: 6124717186586295693}
-  - component: {fileID: 1255986523440969604}
   - component: {fileID: 3993347121148931887}
+  - component: {fileID: 1983315836603315623}
+  - component: {fileID: 7856166244265689951}
+  - component: {fileID: 200166190722130951}
   m_Layer: 0
   m_Name: Ventura
   m_TagString: Untagged
@@ -503,6 +507,42 @@ CharacterController:
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
   m_Center: {x: 0.01, y: 0.52, z: -0.02}
+--- !u!114 &-883407466442919321
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6700597714719235019}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4a0b57fb82205a3499ce9cfb48362b14, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EmojiSystem
+  emojiPrefabs:
+  - {fileID: -2161899937823599655, guid: b938019031c2a7a4c90d99cca9ab41b1, type: 3}
+  - {fileID: 2903333449378537173, guid: 24bb9e01b502e4042bdf74e9a3f4c3a5, type: 3}
+  - {fileID: 10026312746321577, guid: 26e6d9bfa0e0bc448ac90ae20b42074f, type: 3}
+  - {fileID: -561491465972868999, guid: cc21f7c8f00f3cd4b8f339f9d030ff42, type: 3}
+  - {fileID: 35334939900926243, guid: 8d36c117745d5d540a8a975c5d38d809, type: 3}
+  - {fileID: 6209046767455799958, guid: 99b540edcdb6a774eb6136ed0dd71522, type: 3}
+  - {fileID: -5964512375290701935, guid: db0ab958ddddbb3459e9c18e38c3ecfa, type: 3}
+  - {fileID: 8007169053046525922, guid: 0b5f2e370718d1b4bb920953f936c953, type: 3}
+  emojiHeight: 2
+  emojiDuration: 3
+--- !u!114 &-5172753122739088488
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6700597714719235019}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 912df8e949236bb439a92f40f90a72f3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerInteraction
+  interactionRange: 3
 --- !u!114 &1512943388093406324
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -546,13 +586,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   MoveSpeed: 4
-  SprintSpeed: 6
   RotationSpeed: 1
   SpeedChangeRate: 10
-  JumpHeight: 1.2
   Gravity: -15
-  JumpTimeout: 0.1
-  FallTimeout: 0.15
   Grounded: 1
   GroundedOffset: 0.23
   GroundedRadius: 0.61
@@ -598,23 +634,6 @@ MonoBehaviour:
   analogMovement: 0
   cursorLocked: 1
   cursorInputForLook: 1
---- !u!114 &1255986523440969604
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6700597714719235019}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 158639473, guid: e725a070cec140c4caffb81624c8c787, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Fusion.Runtime.dll::Fusion.NetworkTransform
-  _stateAuthorityChangeErrorCorrectionDelta: 0
-  SyncScale: 0
-  SyncParent: 0
-  _autoAOIOverride: 1
-  DisableSharedModeInterpolation: 0
 --- !u!114 &3993347121148931887
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -632,8 +651,50 @@ MonoBehaviour:
   Flags: 262145
   NestedObjects: []
   NetworkedBehaviours:
-  - {fileID: 1255986523440969604}
+  - {fileID: -883407466442919321}
+  - {fileID: -5172753122739088488}
+  - {fileID: 1983315836603315623}
+  - {fileID: 7856166244265689951}
+  - {fileID: 200166190722130951}
   ForceRemoteRenderTimeframe: 0
+--- !u!114 &1983315836603315623
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6700597714719235019}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b166e50cc46b71544aa0ad18e58b950c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerRole
+  _MyRole: 2
+--- !u!114 &7856166244265689951
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6700597714719235019}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 23b5d153ba571604c99a36af4f754449, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerSetup
+--- !u!114 &200166190722130951
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6700597714719235019}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 912df8e949236bb439a92f40f90a72f3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerInteraction
+  interactionRange: 3
 --- !u!1 &6802443234435637333
 GameObject:
   m_ObjectHideFlags: 0
