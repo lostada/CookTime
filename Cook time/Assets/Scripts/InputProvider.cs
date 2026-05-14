@@ -3,25 +3,48 @@ using Fusion.Sockets;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class InputProvider : MonoBehaviour, INetworkRunnerCallbacks
 {
+    private Vector2 _moveInput;
+    private Vector2 _lookInput;
+
+    private void Update()
+    {
+        // Pega o input do New Input System
+        var kb = Keyboard.current;
+        var mouse = Mouse.current;
+
+        if (kb != null)
+        {
+            _moveInput = Vector2.zero;
+            if (kb.wKey.isPressed) _moveInput.y += 1;
+            if (kb.sKey.isPressed) _moveInput.y -= 1;
+            if (kb.aKey.isPressed) _moveInput.x -= 1;
+            if (kb.dKey.isPressed) _moveInput.x += 1;
+            _moveInput = _moveInput.normalized;
+        }
+
+        if (mouse != null)
+            _lookInput = mouse.delta.ReadValue();
+    }
+
     public void OnInput(NetworkRunner runner, NetworkInput input)
     {
         var data = new NetworkInputData
         {
-            moveDirection = new Vector2(
-                Input.GetAxisRaw("Horizontal"),
-                Input.GetAxisRaw("Vertical")).normalized
+            moveDirection = _moveInput,
+            lookDelta = _lookInput,
         };
 
-        if (Input.GetKey(KeyCode.Space))
+        if (Keyboard.current != null && Keyboard.current.spaceKey.isPressed)
             data.buttons.Set(PlayerButton.Jump, true);
 
         input.Set(data);
+        _lookInput = Vector2.zero; // reseta pra não acumular
     }
 
-    // Callbacks obrigatórios (podem ficar vazios)
     public void OnPlayerJoined(NetworkRunner runner, PlayerRef player) { }
     public void OnPlayerLeft(NetworkRunner runner, PlayerRef player) { }
     public void OnInputMissing(NetworkRunner runner, PlayerRef player, NetworkInput input) { }

@@ -13,18 +13,25 @@ public class PlayerRole : NetworkBehaviour
         if (Object.HasInputAuthority)
         {
             int idx = (Runner.LocalPlayer.PlayerId - 1) % 3;
-            MyRole = (RoleType)idx;
-            Debug.Log($"Meu papel: {MyRole}");
+            RPC_SetRole(idx);
+            Debug.Log($"Pedindo role: {(RoleType)idx}");
         }
+    }
+
+    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
+    private void RPC_SetRole(int idx)
+    {
+        MyRole = (RoleType)idx;
+        Debug.Log($"Role setada: {MyRole}");
     }
 
     private void Update()
     {
         if (Object == null || !Object.HasInputAuthority) return;
 
-        if (Keyboard.current.digit1Key.wasPressedThisFrame) { MyRole = RoleType.BreadMaster; Debug.Log("Role: BreadMaster"); }
-        if (Keyboard.current.digit2Key.wasPressedThisFrame) { MyRole = RoleType.MeatMaster; Debug.Log("Role: MeatMaster"); }
-        if (Keyboard.current.digit3Key.wasPressedThisFrame) { MyRole = RoleType.CheeseMaster; Debug.Log("Role: CheeseMaster"); }
+        if (Keyboard.current.digit1Key.wasPressedThisFrame) RPC_SetRole(0);
+        if (Keyboard.current.digit2Key.wasPressedThisFrame) RPC_SetRole(1);
+        if (Keyboard.current.digit3Key.wasPressedThisFrame) RPC_SetRole(2);
     }
 
     public bool CanPickupByTag(string tag)

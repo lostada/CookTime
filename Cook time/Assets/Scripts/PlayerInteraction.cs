@@ -10,8 +10,12 @@ public class PlayerInteraction : NetworkBehaviour
 
     public override void Spawned()
     {
-        Cursor.lockState = CursorLockMode.None;
-        Cursor.visible = true;
+        // So mexe no cursor se for player local
+        if (Object.HasInputAuthority)
+        {
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+        }
 
         if (!Object.HasInputAuthority)
         {
@@ -23,13 +27,13 @@ public class PlayerInteraction : NetworkBehaviour
         myRole = GetComponent<PlayerRole>();
         if (myRole == null)
         {
-            Debug.LogError("PlayerRole não encontrado!");
+            Debug.LogError("PlayerRole nao encontrado!");
             return;
         }
 
         myCamera = GetComponentInChildren<Camera>();
         if (myCamera == null)
-            Debug.LogError("Nenhuma câmera encontrada no player!");
+            Debug.LogError("Nenhuma camera encontrada no player!");
         else
             Debug.Log($"PlayerInteraction pronto! Role: {myRole.MyRole} | Camera: {myCamera.name}");
     }
@@ -55,7 +59,7 @@ public class PlayerInteraction : NetworkBehaviour
 
                 if (!myRole.CanPickupByTag(tag))
                 {
-                    Debug.Log($"❌ {myRole.MyRole} não pode pegar {hit.collider.name}");
+                    Debug.Log($"❌ {myRole.MyRole} nao pode pegar {hit.collider.name}");
                     return;
                 }
 

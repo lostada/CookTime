@@ -195,7 +195,7 @@ public class GameManager : NetworkBehaviour
             RPC_RequestAddIngredient(ingredientName, player, (int)playerRole);
     }
 
-    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
+    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
     private void RPC_RequestAddIngredient(string ingredientName, PlayerRef player, int roleInt)
     {
         ProcessIngredient(ingredientName, player, roleInt);
@@ -207,10 +207,35 @@ public class GameManager : NetworkBehaviour
 
         RoleType playerRole = (RoleType)roleInt;
 
-        if (ingredientName == currentOrderBread.Value && playerRole == RoleType.BreadMaster) currentPlateStage = 1;
-        else if (ingredientName == currentOrderMeat.Value && playerRole == RoleType.MeatMaster) currentPlateStage = 2;
-        else if (ingredientName == currentOrderCheese.Value && playerRole == RoleType.CheeseMaster) currentPlateStage = 3;
-        else { RPC_ShowMessage("Ingrediente errado ou role errada!"); return; }
+        bool added = false;
+
+        if (playerRole == RoleType.BreadMaster &&
+            ingredientName == currentOrderBread.Value &&
+            currentPlateStage == 0)
+        {
+            currentPlateStage = 1;
+            added = true;
+        }
+        else if (playerRole == RoleType.MeatMaster &&
+                 ingredientName == currentOrderMeat.Value &&
+                 currentPlateStage == 1)
+        {
+            currentPlateStage = 2;
+            added = true;
+        }
+        else if (playerRole == RoleType.CheeseMaster &&
+                 ingredientName == currentOrderCheese.Value &&
+                 currentPlateStage == 2)
+        {
+            currentPlateStage = 3;
+            added = true;
+        }
+
+        if (!added)
+        {
+            RPC_ShowMessage($"Ingrediente errado ou fora de ordem! Stage atual: {currentPlateStage}");
+            return;
+        }
 
         RPC_ShowMessage($"{ingredientName} adicionado! Stage: {currentPlateStage}/3");
 

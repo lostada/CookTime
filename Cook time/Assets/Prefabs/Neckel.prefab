@@ -188,6 +188,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4037031442485468258}
   - component: {fileID: 5301199322418611567}
+  - component: {fileID: 160243595513652315}
   - component: {fileID: -4648553070019623873}
   - component: {fileID: 6788348609723501014}
   - component: {fileID: 7752128797855533005}
@@ -247,6 +248,18 @@ CharacterController:
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
   m_Center: {x: 0.01, y: 0.52, z: -0.02}
+--- !u!114 &160243595513652315
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1944692621596970290}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4912476137e986843bf4906223806741, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerSync
 --- !u!114 &-4648553070019623873
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -391,6 +404,7 @@ MonoBehaviour:
   Flags: 262145
   NestedObjects: []
   NetworkedBehaviours:
+  - {fileID: 160243595513652315}
   - {fileID: -4648553070019623873}
   - {fileID: 6788348609723501014}
   - {fileID: -1701034758523860827}

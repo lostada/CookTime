@@ -447,6 +447,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7901115767149416932}
   - component: {fileID: 1159384991406263115}
+  - component: {fileID: 6944680614673221681}
   - component: {fileID: -883407466442919321}
   - component: {fileID: -5172753122739088488}
   - component: {fileID: 1512943388093406324}
@@ -507,6 +508,18 @@ CharacterController:
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
   m_Center: {x: 0.01, y: 0.52, z: -0.02}
+--- !u!114 &6944680614673221681
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6700597714719235019}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4912476137e986843bf4906223806741, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerSync
 --- !u!114 &-883407466442919321
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -528,7 +541,7 @@ MonoBehaviour:
   - {fileID: 6209046767455799958, guid: 99b540edcdb6a774eb6136ed0dd71522, type: 3}
   - {fileID: -5964512375290701935, guid: db0ab958ddddbb3459e9c18e38c3ecfa, type: 3}
   - {fileID: 8007169053046525922, guid: 0b5f2e370718d1b4bb920953f936c953, type: 3}
-  emojiHeight: 2
+  emojiSpawnPoint: {fileID: 0}
   emojiDuration: 3
 --- !u!114 &-5172753122739088488
 MonoBehaviour:
@@ -651,6 +664,7 @@ MonoBehaviour:
   Flags: 262145
   NestedObjects: []
   NetworkedBehaviours:
+  - {fileID: 6944680614673221681}
   - {fileID: -883407466442919321}
   - {fileID: -5172753122739088488}
   - {fileID: 1983315836603315623}
