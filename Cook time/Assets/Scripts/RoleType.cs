@@ -1,6 +1,7 @@
 ﻿using Fusion;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using TMPro;
 
 public enum RoleType { BreadMaster, MeatMaster, CheeseMaster }
 
@@ -8,14 +9,20 @@ public class PlayerRole : NetworkBehaviour
 {
     [Networked] public RoleType MyRole { get; set; }
 
+    [Header("UI")]
+    public TextMeshProUGUI roleText;
+
     public override void Spawned()
     {
-        if (Object.HasInputAuthority)
-        {
-            int idx = (Runner.LocalPlayer.PlayerId - 1) % 3;
-            RPC_SetRole(idx);
-            Debug.Log($"Pedindo role: {(RoleType)idx}");
-        }
+        if (!Object.HasInputAuthority) return;
+
+        // Busca o texto automaticamente se nao estiver preenchido
+        if (roleText == null)
+            roleText = GameObject.Find("RoleText")?.GetComponent<TextMeshProUGUI>();
+
+        int idx = (Runner.LocalPlayer.PlayerId - 1) % 3;
+        RPC_SetRole(idx);
+        Debug.Log($"Pedindo role: {(RoleType)idx}");
     }
 
     [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
@@ -23,6 +30,22 @@ public class PlayerRole : NetworkBehaviour
     {
         MyRole = (RoleType)idx;
         Debug.Log($"Role setada: {MyRole}");
+    }
+
+    public override void Render()
+    {
+        if (!Object.HasInputAuthority) return;
+        if (roleText == null) return;
+
+        string roleName = MyRole switch
+        {
+            RoleType.BreadMaster => "Mestre do Pao",
+            RoleType.MeatMaster => "Mestre da Carne",
+            RoleType.CheeseMaster => "Mestre do Queijo",
+            _ => "?"
+        };
+
+        roleText.text = $"Sua funcao: {roleName}";
     }
 
     private void Update()
