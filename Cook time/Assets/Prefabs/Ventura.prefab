@@ -1,5 +1,36 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &1845025936459241570
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1132277444909453080}
+  m_Layer: 0
+  m_Name: Emoji
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1132277444909453080
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1845025936459241570}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: 1, z: -0, w: 0}
+  m_LocalPosition: {x: 0, y: 0.031199994, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 8676973019569091462}
+  m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
 --- !u!1 &2845751570666290716
 GameObject:
   m_ObjectHideFlags: 0
@@ -119,7 +150,8 @@ Transform:
   m_LocalPosition: {x: -0.072, y: 0, z: 0}
   m_LocalScale: {x: 46.94551, y: 46.94551, z: 46.94551}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 1132277444909453080}
   m_Father: {fileID: 2298054497502852937}
   m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
 --- !u!33 &1799432678979729868
@@ -541,7 +573,7 @@ MonoBehaviour:
   - {fileID: 6209046767455799958, guid: 99b540edcdb6a774eb6136ed0dd71522, type: 3}
   - {fileID: -5964512375290701935, guid: db0ab958ddddbb3459e9c18e38c3ecfa, type: 3}
   - {fileID: 8007169053046525922, guid: 0b5f2e370718d1b4bb920953f936c953, type: 3}
-  emojiSpawnPoint: {fileID: 0}
+  emojiSpawnPoint: {fileID: 1132277444909453080}
   emojiDuration: 3
 --- !u!114 &-5172753122739088488
 MonoBehaviour:

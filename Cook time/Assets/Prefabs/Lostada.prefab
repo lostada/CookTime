@@ -103,7 +103,8 @@ MonoBehaviour:
   - {fileID: 6209046767455799958, guid: 99b540edcdb6a774eb6136ed0dd71522, type: 3}
   - {fileID: -5964512375290701935, guid: db0ab958ddddbb3459e9c18e38c3ecfa, type: 3}
   - {fileID: 8007169053046525922, guid: 0b5f2e370718d1b4bb920953f936c953, type: 3}
-  emojiSpawnPoint: {fileID: 0}
+  - {fileID: 2903333449378537173, guid: 3441813ac02c06a4f955a69f02a9e363, type: 3}
+  emojiSpawnPoint: {fileID: 288412986705271334}
   emojiDuration: 3
 --- !u!114 &3018257931049938836
 MonoBehaviour:
@@ -690,7 +691,8 @@ Transform:
   m_LocalPosition: {x: -0.072, y: 0, z: 0}
   m_LocalScale: {x: 46.9455, y: 46.94551, z: 46.9455}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 288412986705271334}
   m_Father: {fileID: 6920729821726705056}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &157476314321456688
@@ -749,3 +751,34 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!1 &9045058671490127509
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 288412986705271334}
+  m_Layer: 0
+  m_Name: Emoji
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &288412986705271334
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9045058671490127509}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: 1, z: -0.000000021855696, w: 0}
+  m_LocalPosition: {x: 0, y: 0.031199994, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 6833720733336079027}
+  m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
